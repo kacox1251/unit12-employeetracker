@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "AshleIgH1!~",
+  password: "",
   database: "employeeTrackerDB"
 });
 
@@ -36,6 +36,9 @@ const startApp = () => {
             case "View All Employees":
                 viewAll();
                 break;
+            case "View All Employees By Department":
+                viewAllByDepartment();
+                break;
         };
     });
 };
@@ -53,5 +56,29 @@ const viewAll = () => {
         console.log(empTable.white);
 
         startApp();
+    });
+};
+
+const viewAllByDepartment = () => {
+    inquirer.prompt([
+        {
+        message: "Which department would you like to view the employees from?",
+        choices: ["Sales", "Production", "Development"],
+        name: "department",
+        type: "list"
+        }
+    ]).then((response) => {
+        let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE department.name = ?";
+        connection.query(query, [response.department], function (err, res) {
+            let table = [];
+            for (var i = 0; i < res.length; i++) {
+                table.push({ name: res[i].first_name + " " + res[i].last_name, title: res[i].title, department: res[i].name });
+            };
+
+            let depTable = consoleTable.getTable(table);
+            console.log(depTable.white);
+
+            startApp();
+        });
     });
 };
