@@ -20,6 +20,7 @@
     "colors": "^1.4.0",
     "console.table": "^0.10.0",
     "inquirer": "^7.0.6",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "dotenv": "^8.2.0"
   }
 }
