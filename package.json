@@ -1,0 +1,25 @@
+{
+  "name": "employee-tracker",
+  "version": "1.0.0",
+  "description": "A node application that uses a MySQL database to keep track of employees",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kacox1251/unit12-employeetracker"
+  },
+  "author": "Krystal Cox",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kacox1251/unit12-employeetracker/issues"
+  },
+  "homepage": "https://github.com/kacox1251/unit12-employeetracker#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "console.table": "^0.10.0",
+    "inquirer": "^7.0.6",
+    "mysql": "^2.18.1"
+  }
+}
