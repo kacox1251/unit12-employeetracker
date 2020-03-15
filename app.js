@@ -32,5 +32,26 @@ const startApp = () => {
         }
     ]).then(({ startApp }) => {
         console.log(startApp)
+        switch (startApp) {
+            case "View All Employees":
+                viewAll();
+                break;
+        };
+    });
+};
+
+const viewAll = () => {
+    let query = "SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id ORDER BY employee.id ASC";
+    
+    connection.query(query, function (err, res) {
+        let table = [];
+        for (var i = 0; i < res.length; i++) {
+            table.push({ id: res[i].id, name: res[i].first_name + " " + res[i].last_name, title: res[i].title, salary: res[i].salary, department: res[i].department});
+        };
+
+        let empTable = consoleTable.getTable(table);
+        console.log(empTable.white);
+
+        startApp();
     });
 };
