@@ -68,19 +68,14 @@ INNER JOIN
 WHERE
 	department.name = "Production";
 
--- View employees by role
+-- View employees
 SELECT 
-	employee.id,
-    employee.first_name,
-    employee.last_name,
-    role.title,
-    department.name,
-    role.salary
-FROM
-    employee
-INNER JOIN
-    role ON employee.role_id = role.id
-INNER JOIN
-    department ON role.department_id = department.id
-WHERE
-	role.title = "Coordinator";
+	id, 
+    first_name, 
+    last_name, 
+    role_id, 
+    manager_id 
+FROM 
+    employee 
+ORDER BY 
+    id ASC;

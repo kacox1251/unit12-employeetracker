@@ -39,6 +39,9 @@ const startApp = () => {
             case "View All Employees By Department":
                 viewAllByDepartment();
                 break;
+            case "Add Employee":
+                addEmployee();
+                break;
         };
     });
 };
@@ -82,3 +85,54 @@ const viewAllByDepartment = () => {
         });
     });
 };
+
+const addEmployee = () => {
+    let query = "SELECT * FROM role";
+
+    connection.query(query, function (err, res) {
+        let roles = [];
+        
+        for (i = 0; i < res.length; i++) {
+            roles.push(Object.values(res[i].title).join(""));
+        };
+
+        inquirer.prompt([
+            {
+            message: "Enter first name of employee:",
+            name: "first_name",
+            type: "input"
+            },
+            {
+            message: "Enter last name of employee:",
+            name: "last_name",
+            type: "input"
+            },
+            {
+            message: "Enter employee's role:",
+            name: "role",
+            choices: roles,
+            type: "list"
+            }
+        ]).then((response) => {
+            let query = "SELECT id FROM role WHERE title = ?";
+            connection.query(query, [response.role], function (err, res) {
+                console.log(res[0].id)
+                let roleId = res[0].id;
+                // console.log(roleId);
+                const query = "INSERT INTO employee SET ?, ?, ?, ?"
+                connection.query( query,
+
+                    [{ first_name: response.first_name }, 
+                    { last_name: response.last_name }, 
+                    { role_id: roleId },
+                    { manager_id: null }],
+
+                    function(err, r) {
+                        if (err) throw err;
+                        startApp();
+                    }
+                );            
+            });
+        });
+    });
+}
