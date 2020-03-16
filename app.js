@@ -103,42 +103,65 @@ const addEmployee = () => {
             roles.push(Object.values(res[i].title).join(""));
         };
 
-        inquirer.prompt([
-            {
-            message: "Enter first name of employee:",
-            name: "first_name",
-            type: "input"
-            },
-            {
-            message: "Enter last name of employee:",
-            name: "last_name",
-            type: "input"
-            },
-            {
-            message: "Enter employee's role:",
-            name: "role",
-            choices: roles,
-            type: "list"
-            }
-        ]).then((response) => {
-            let query = "SELECT id FROM role WHERE title = ?";
-            connection.query(query, [response.role], function (err, res) {
-                console.log(res[0].id)
-                let roleId = res[0].id;
-                // console.log(roleId);
-                const query = "INSERT INTO employee SET ?, ?, ?, ?"
-                connection.query( query,
+        let query = "SELECT * FROM manager";
 
-                    [{ first_name: response.first_name }, 
-                    { last_name: response.last_name }, 
-                    { role_id: roleId },
-                    { manager_id: null }],
+        connection.query(query, function (err, res) {
+            let managers = [];
+            let managerRes = res;
 
-                    function(err, r) {
-                        if (err) throw err;
-                        startApp();
-                    }
-                );            
+            for (i = 0; i < res.length; i++) {
+                managers.push(Object.values(res[i].full_name).join(""));
+            };
+            inquirer.prompt([
+                {
+                message: "Enter first name of employee:",
+                name: "first_name",
+                type: "input"
+                },
+                {
+                message: "Enter last name of employee:",
+                name: "last_name",
+                type: "input"
+                },
+                {
+                message: "Select employee's role:",
+                name: "role",
+                choices: roles,
+                type: "list"
+                },
+                {
+                message: "Select employee's manager:",
+                name: "manager",
+                choices: managers,
+                type: "list"
+                }
+            ]).then((response) => {
+                let query = "SELECT id FROM role WHERE title = ?";
+                connection.query(query, [response.role], function (err, res) {
+                    // console.log(res[0].id)
+                    let roleId = res[0].id;
+                    // console.log(roleId);
+                    let query = "SELECT id FROM manager WHERE full_name = ?";
+                    connection.query(query, [response.manager], function (err, res) {
+                        // console.log(res[0].id)
+                        let managerId = res[0].id;
+                        // console.log(roleId);
+
+                        const query = "INSERT INTO employee SET ?, ?, ?, ?"
+                        connection.query( query,
+
+                            [{ first_name: response.first_name }, 
+                            { last_name: response.last_name }, 
+                            { role_id: roleId },
+                            { manager_id: managerId }],
+
+                            function(err, r) {
+                                if (err) throw err;
+                                startApp();
+                            }
+                        );
+                    });            
+                });
             });
         });
     });
@@ -155,7 +178,7 @@ const updateRole = () => {
         for (i = 0; i < res.length; i++) {
             listOfEmployees.push(Object.values(res[i].full_name).join(""));
         };
-        console.log(res[0])
+        // console.log(res[0])
         
 
         let query = "SELECT * FROM role";
