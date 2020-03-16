@@ -42,17 +42,20 @@ const startApp = () => {
             case "Add Employee":
                 addEmployee();
                 break;
+            case "Update Employee Role":
+                updateRole();
+                break;
         };
     });
 };
 
 const viewAll = () => {
-    let query = "SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id ORDER BY employee.id ASC";
+    let query = "SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title, role.salary, manager.full_name FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id INNER JOIN manager ON employee.manager_id = manager.id ORDER BY employee.id ASC;";
     
     connection.query(query, function (err, res) {
         let table = [];
         for (var i = 0; i < res.length; i++) {
-            table.push({ id: res[i].id, name: res[i].first_name + " " + res[i].last_name, title: res[i].title, salary: res[i].salary, department: res[i].department});
+            table.push({ id: res[i].id, name: res[i].first_name + " " + res[i].last_name, title: res[i].title, salary: res[i].salary, department: res[i].department, manager: res[i].full_name});
         };
 
         let empTable = consoleTable.getTable(table);
@@ -66,16 +69,17 @@ const viewAllByDepartment = () => {
     inquirer.prompt([
         {
         message: "Which department would you like to view the employees from?",
-        choices: ["Sales", "Production", "Development"],
+        choices: ["Sales", "Production", "Development", "Corporate"],
         name: "department",
         type: "list"
         }
     ]).then((response) => {
-        let query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE department.name = ?";
+        let query = "SELECT employee.id, employee.first_name, employee.last_name, department.name AS department, role.title, role.salary, manager.full_name FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id INNER JOIN manager ON employee.manager_id = manager.id WHERE department.name = ?";
+        
         connection.query(query, [response.department], function (err, res) {
             let table = [];
             for (var i = 0; i < res.length; i++) {
-                table.push({ name: res[i].first_name + " " + res[i].last_name, title: res[i].title, department: res[i].name });
+                table.push({ name: res[i].first_name + " " + res[i].last_name, title: res[i].title, salary: res[i].salary });
             };
 
             let depTable = consoleTable.getTable(table);
@@ -136,3 +140,64 @@ const addEmployee = () => {
         });
     });
 }
+
+
+const updateRole = () => {
+    let query = "SELECT id, first_name, last_name, CONCAT_WS(' ', first_name, last_name) AS full_name FROM employee;";
+    connection.query(query, function (err, res) {
+        
+        const employeeRes = res;
+
+        let listOfEmployees = [];
+        for (i = 0; i < res.length; i++) {
+            listOfEmployees.push(Object.values(res[i].full_name).join(""));
+        };
+        console.log(res[0])
+        
+
+        let query = "SELECT * FROM role";
+        connection.query(query, function (err, res) {
+            let listOfRoles = [];
+            for (i = 0; i < res.length; i++) {
+                listOfRoles.push(Object.values(res[i].title).join(""));
+            };
+        
+            inquirer.prompt([
+                {
+                message: "Which employee would you like to update?",
+                name: "employee",
+                type: "list",
+                choices: listOfEmployees
+                },
+                {
+                message: "Which role will they be updated to?",
+                name: "title",
+                type: "list",
+                choices: listOfRoles
+                }
+            ]).then((response) => {
+                let roleId;
+                let employeeId;
+
+                for (i = 0; i < employeeRes.length; i++) {
+                    if (employeeRes[i].full_name === response.employee) {
+                        employeeId = employeeRes[i].id;
+                    };
+                };
+
+                for (i = 0; i < res.length; i++) {
+                    if (res[i].title === response.title) {
+                        roleId = res[i].id;
+                    };
+                };
+
+                let query = ("UPDATE employee SET ? WHERE ?");
+
+                connection.query(query, [{ role_id: roleId }, { id: employeeId }], function (err, res) {
+                    if (err) throw err;
+                    startApp();
+                });
+            });
+        });
+    });
+};

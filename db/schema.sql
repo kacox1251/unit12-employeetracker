@@ -27,12 +27,16 @@ CREATE TABLE employee (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE manager (
+    id INT AUTO_INCREMENT NOT NULL,
+    full_name VARCHAR (30),
+    PRIMARY KEY (id)
+)
+
 SELECT * FROM department;
 SELECT * FROM role;
 SELECT * FROM employee;
-
--- add employees, add departments, add roles
--- update employee roles
+SELECT * FROM manager;
 
 -- View all employees
 SELECT 
@@ -41,13 +45,16 @@ SELECT
     employee.last_name, 
     department.name AS department, 
     role.title, 
-    role.salary 
+    role.salary, 
+    manager.full_name 
 FROM 
-    employee
+    employee 
 INNER JOIN 
     role ON employee.role_id = role.id 
 INNER JOIN 
     department ON role.department_id = department.id 
+INNER JOIN 
+    manager ON employee.manager_id = manager.id 
 ORDER BY 
     employee.id ASC;
 
