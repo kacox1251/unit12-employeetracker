@@ -18,7 +18,6 @@ connection.connect(function (err) {
     startApp();
 });
 
-// Start Application
 const startApp = () => {
     inquirer.prompt([
         {
@@ -27,7 +26,8 @@ const startApp = () => {
         choices: ["View All Employees", 
         "View All Employees By Department",
         "Add Employee", 
-        "Update Employee Role"],
+        "Update Employee Role",
+        "Exit"],
         name: "startApp"
         }
     ]).then(({ startApp }) => {
@@ -45,6 +45,9 @@ const startApp = () => {
             case "Update Employee Role":
                 updateRole();
                 break;
+            default:
+                console.log("Thank you,see you next time!")
+                process.exit();
         };
     });
 };
